@@ -1,0 +1,31 @@
+# ===========================================
+# Strapi CMS Container
+# ===========================================
+
+FROM node:20-bookworm-slim
+
+LABEL maintainer="ABS Development Team"
+LABEL description="Strapi CMS for AutoBuilder Suite"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies for SQLite and build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3 \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Use non-root user
+RUN chown -R node:node /app
+USER node
+
+# Expose Strapi port
+EXPOSE 1337
+
+# Default command (will be overridden by compose)
+CMD ["npm", "run", "develop"]

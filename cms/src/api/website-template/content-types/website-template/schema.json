@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "website_templates",
+  "info": {
+    "singularName": "website-template",
+    "pluralName": "website-templates",
+    "displayName": "Website Template",
+    "description": "Webstudio starter templates managed via CMS"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "business",
+        "portfolio",
+        "ecommerce",
+        "blog",
+        "landing",
+        "saas",
+        "agency",
+        "personal",
+        "other"
+      ],
+      "default": "other",
+      "required": true
+    },
+    "webstudioProjectId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "previewUrl": {
+      "type": "string"
+    },
+    "features": {
+      "type": "json"
+    },
+    "isPremium": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

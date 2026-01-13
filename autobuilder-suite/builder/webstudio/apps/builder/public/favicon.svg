@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Autobuilder Suite Favicon - stylized "A" with blue-purple gradient -->
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#favicon_gradient)"/>
+  <path d="M16 6L7 26H11L13 21H19L21 26H25L16 6ZM14.4 17L16 12L17.6 17H14.4Z" fill="white"/>
+  <defs>
+    <linearGradient id="favicon_gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+</svg>

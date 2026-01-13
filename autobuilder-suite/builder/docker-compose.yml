@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: autobuilder_db
+    environment:
+      POSTGRES_USER: webstudio
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: webstudio
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webstudio -d webstudio"]
+      interval: 10s
+      timeout: 5s
+      retries: 25
+
+  postgrest:
+    container_name: webstudio-postgrest
+    image: postgrest/postgrest:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgresql://webstudio:password@postgres:5432/webstudio
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: jwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecret
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:

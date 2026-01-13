@@ -1,0 +1,92 @@
+{
+  "name": "ABS Development Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+
+  // Features to install
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  // VS Code extensions for the stack
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // TypeScript & JavaScript
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        
+        // Prisma & Database
+        "prisma.prisma",
+        "cweijan.vscode-postgresql-client2",
+        
+        // Docker
+        "ms-azuretools.vscode-docker",
+        
+        // REST API Testing
+        "humao.rest-client",
+        "rangav.vscode-thunder-client",
+        
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        
+        // Productivity
+        "christian-kohler.path-intellisense",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "gruntfuggly.todo-tree",
+        
+        // Themes & Icons
+        "pkief.material-icon-theme",
+        
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        
+        // Remote Development
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "files.eol": "\n"
+      }
+    }
+  },
+
+  // Ports to forward
+  "forwardPorts": [5173, 1337, 5432, 3000, 6006],
+  "portsAttributes": {
+    "5173": { "label": "Webstudio Builder", "onAutoForward": "notify" },
+    "1337": { "label": "Strapi CMS", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "3000": { "label": "PostgREST API", "onAutoForward": "silent" },
+    "6006": { "label": "Storybook", "onAutoForward": "notify" }
+  },
+
+  // Run after container is created
+  "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+
+  // Run after container starts
+  "postStartCommand": "bash .devcontainer/scripts/post-start.sh",
+
+  // Environment variables
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "postgresql://webstudio:password@postgres:5432/webstudio?schema=public",
+    "DIRECT_URL": "postgresql://webstudio:password@postgres:5432/webstudio?schema=public",
+    "POSTGREST_URL": "http://postgrest:3000"
+  },
+
+  // Use non-root user
+  "remoteUser": "node"
+}

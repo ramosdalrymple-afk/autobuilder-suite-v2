@@ -1,0 +1,19 @@
+{
+  "name": "abs",
+  "version": "1.0.0",
+  "description": "AutoBuilder Suite - CMS and Builder Services",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently -n cms,docker,builder -c blue,yellow,green \"cd cms && npm run develop\" \"cd autobuilder-suite/builder && docker-compose up\" \"cd autobuilder-suite/builder/webstudio/apps/builder && pnpm remix vite:dev\"",
+    "start:cms": "cd cms && npm run develop",
+    "start:docker": "cd autobuilder-suite/builder && docker-compose up",
+    "start:builder": "cd autobuilder-suite/builder/webstudio/apps/builder && pnpm remix vite:dev",
+    "stop:docker": "cd autobuilder-suite/builder && docker-compose down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # Development Container (Main Workspace)
+  # ===========================================
+  dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: abs-dev
+    volumes:
+      - ..:/workspace:cached
+      - node_modules_webstudio:/workspace/autobuilder-suite/builder/webstudio/node_modules
+      - node_modules_cms:/workspace/cms/node_modules
+      - pnpm-store:/home/node/.local/share/pnpm/store
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://webstudio:password@postgres:5432/webstudio?schema=public
+      - DIRECT_URL=postgresql://webstudio:password@postgres:5432/webstudio?schema=public
+      - POSTGREST_URL=http://postgrest:3000
+      - POSTGREST_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc2ODEyNDM2OSwiZXhwIjoxNzk5NjYwMzY5fQ.I4k6_w5D6XO6WFrdY1M3hsjkmtX8wLpjA8erjIAnSR0
+      - DEV_LOGIN=true
+      - AUTH_SECRET=dev-secret-key
+      - STRAPI_URL=http://strapi:1337
+    ports:
+      - "5173:5173"   # Webstudio Builder
+      - "6006:6006"   # Storybook
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgrest:
+        condition: service_started
+    command: sleep infinity
+    networks:
+      - abs-network
+
+  # ===========================================
+  # PostgreSQL Database
+  # ===========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: abs-postgres
+    environment:
+      POSTGRES_USER: webstudio
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: webstudio
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../autobuilder-suite/builder/init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webstudio -d webstudio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - abs-network
+
+  # ===========================================
+  # PostgREST API
+  # ===========================================
+  postgrest:
+    image: postgrest/postgrest:latest
+    container_name: abs-postgrest
+    environment:
+      PGRST_DB_URI: postgresql://webstudio:password@postgres:5432/webstudio
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: jwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecretjwtsecret
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - abs-network
+
+  # ===========================================
+  # Strapi CMS
+  # ===========================================
+  strapi:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.strapi
+    container_name: abs-strapi
+    volumes:
+      - ../cms:/app:cached
+      - node_modules_cms:/app/node_modules
+    environment:
+      - HOST=0.0.0.0
+      - PORT=1337
+      - APP_KEYS=key1,key2,key3,key4
+      - API_TOKEN_SALT=dev-api-token-salt
+      - ADMIN_JWT_SECRET=dev-admin-jwt-secret
+      - TRANSFER_TOKEN_SALT=dev-transfer-salt
+      - JWT_SECRET=dev-jwt-secret
+      - DATABASE_CLIENT=sqlite
+      - DATABASE_FILENAME=.tmp/data.db
+    ports:
+      - "1337:1337"
+    networks:
+      - abs-network
+
+networks:
+  abs-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  node_modules_webstudio:
+  node_modules_cms:
+  pnpm-store:
