@@ -35,19 +35,42 @@ export const ProjectMenu = ({ projectId, onOpenChange }: ProjectMenuProps) => {
         <DropdownMenuItem onSelect={handleDuplicateProject}>
           Duplicate
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onOpenChange("rename")}>
+        <DropdownMenuItem onSelect={() => onOpenChange("rename")}> 
           Rename
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onOpenChange("share")}>
+        <DropdownMenuItem onSelect={() => onOpenChange("share")}> 
           Share
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onOpenChange("tags")}>
+        <DropdownMenuItem onSelect={() => onOpenChange("tags")}> 
           Tags
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onOpenChange("settings")}>
+        <DropdownMenuItem onSelect={() => onOpenChange("settings")}> 
           Settings
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onOpenChange("delete")}>
+        <DropdownMenuItem
+          onSelect={async () => {
+            // Call Strapi API to save as template
+            await fetch(`${process.env.STRAPI_URL}/api/website-templates`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(process.env.STRAPI_API_TOKEN ? { "Authorization": `Bearer ${process.env.STRAPI_API_TOKEN}` } : {})
+              },
+              body: JSON.stringify({
+                data: {
+                  name: "New Template", // You can prompt for name if needed
+                  webstudioProjectId: projectId,
+                  description: "Created from builder",
+                  category: "other"
+                }
+              })
+            });
+            alert("Project saved as template!");
+          }}
+        >
+          Save as Template
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => onOpenChange("delete")}> 
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,0 +1,35 @@
+
+> webstudio-root@0.0.0 dev C:\Users\ddal6\HOLY IT PROJECTS\ABS\autobuilder-suite\builder\webstudio
+> pnpm --filter="@webstudio-is/builder" dev
+
+packages/cli                             | ΓÇëWARNΓÇë Unsupported engine: wanted: {"node":">=20.12"} (current: {"node":"v20.10.0","pnpm":"9.15.4"})
+
+> @webstudio-is/builder@0.0.0 dev C:\Users\ddal6\HOLY IT PROJECTS\ABS\autobuilder-suite\builder\webstudio\apps\builder
+> pnpm build:http-client && remix vite:dev
+
+
+> @webstudio-is/builder@0.0.0 build:http-client C:\Users\ddal6\HOLY IT PROJECTS\ABS\autobuilder-suite\builder\webstudio\apps\builder
+> pnpm --filter=@webstudio-is/http-client build
+
+../../packages/cli                       | ΓÇëWARNΓÇë Unsupported engine: wanted: {"node":">=20.12"} (current: {"node":"v20.10.0","pnpm":"9.15.4"})
+
+> @webstudio-is/http-client@0.0.0-webstudio-version build C:\Users\ddal6\HOLY IT PROJECTS\ABS\autobuilder-suite\builder\webstudio\packages\http-client
+> rimraf lib && esbuild src/index.ts --outdir=lib --bundle --format=esm --packages=external
+
+
+  lib\index.js  2.4kb
+
+Done in 59ms
+  [32mΓ₧£[39m  [1mLocal[22m:   [36mhttps://vite.wstd.dev:[1m5173[22m/[39m
+  [32mΓ₧£[39m  [1mNetwork[22m: [36mhttps://wstd.dev:[1m5173[22m/[39m
+[2m[32m  Γ₧£[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[auth] Dev login enabled: true AUTH_SECRET set: true
+[Static Export] Handler registered for local development
+[GET] /login?returnTo=%2Fdashboard - 9381ms : [2mvite.wstd.dev:5173[22m
+[GET] /favicon.ico - 2ms : [2mvite.wstd.dev:5173[22m
+[GET] /dashboard - 161ms : [2mvite.wstd.dev:5173[22m
+[GET] /login?returnTo=%2Fdashboard - 475ms : [2mvite.wstd.dev:5173[22m
+C:\Users\ddal6\HOLY IT PROJECTS\ABS\autobuilder-suite\builder\webstudio\apps\builder:
+ΓÇëERR_PNPM_RECURSIVE_RUN_FIRST_FAILΓÇë @webstudio-is/builder@0.0.0 dev: `pnpm build:http-client && remix vite:dev`
+Exit status 3221225786
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 3221225786.

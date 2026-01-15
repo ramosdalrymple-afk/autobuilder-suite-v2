@@ -21,7 +21,7 @@ services:
       - POSTGREST_URL=http://postgrest:3000
       - POSTGREST_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc2ODEyNDM2OSwiZXhwIjoxNzk5NjYwMzY5fQ.I4k6_w5D6XO6WFrdY1M3hsjkmtX8wLpjA8erjIAnSR0
       - DEV_LOGIN=true
-      - AUTH_SECRET=dev-secret-key
+      - AUTH_SECRET=B9D023CD4FDD637F1B99B6347FC3226FE9A0BA1BBA5A5F4B9330809DA001BD20
       - STRAPI_URL=http://strapi:1337
     ports:
       - "5173:5173"   # Webstudio Builder
@@ -75,6 +75,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - abs-network
 

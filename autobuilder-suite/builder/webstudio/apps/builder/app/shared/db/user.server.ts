@@ -21,19 +21,24 @@ const formatUser = (user: Database["public"]["Tables"]["User"]["Row"]) => {
   };
 };
 
-export const getUserById = async (context: AppContext, id: User["id"]) => {
-  const dbUser = await context.postgrest.client
-    .from("User")
-    .select()
-    .eq("id", id)
-    .single();
+export const getUserById = async (context: AppContext, id: User["id"]): Promise<User | null> => {
+  try {
+    const dbUser = await context.postgrest.client
+      .from("User")
+      .select()
+      .eq("id", id)
+      .single();
 
-  if (dbUser.error) {
-    console.error(dbUser.error);
-    throw new Error("User not found");
+    if (dbUser.error) {
+      console.error("[getUserById] PostgREST error while selecting user", { id, error: dbUser.error });
+      return null;
+    }
+
+    return formatUser(dbUser.data);
+  } catch (error) {
+    console.error("[getUserById] Unexpected error while selecting user", { id, error });
+    return null;
   }
-
-  return formatUser(dbUser.data);
 };
 
 const genericCreateAccount = async (
@@ -52,28 +57,32 @@ const genericCreateAccount = async (
     .single();
 
   if (dbUser.error == null) {
+    console.log("[genericCreateAccount] Existing user found:", dbUser.data.id, userData.email);
     return formatUser(dbUser.data);
   }
 
   // https://github.com/PostgREST/postgrest/blob/bfbd033c6e9f38cfbc8b1cfe19ee009a9379e3dd/docs/references/errors.rst#L234
   if (dbUser.error.code !== "PGRST116") {
-    console.error(dbUser.error);
+    console.error("[genericCreateAccount] Error selecting user by email", { email: userData.email, error: dbUser.error });
     throw new Error("User not found");
   }
 
+  const id = crypto.randomUUID();
   const newUser = await context.postgrest.client
     .from("User")
     .insert({
-      id: crypto.randomUUID(),
+      id,
       ...userData,
     })
     .select()
     .single();
 
   if (newUser.error) {
-    console.error(newUser.error);
+    console.error("[genericCreateAccount] Failed to insert user", { email: userData.email, id, error: newUser.error });
     throw new Error("Failed to create user");
   }
+
+  console.log("[genericCreateAccount] Created new user", { id: newUser.data.id, email: newUser.data.email });
 
   return formatUser(newUser.data);
 };

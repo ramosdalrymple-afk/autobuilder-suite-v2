@@ -196,6 +196,10 @@ const createTrpcCache = () => {
 };
 
 export const createPostrestContext = () => {
+  console.log("[createPostrestContext] POSTGREST_URL:", env.POSTGREST_URL);
+  if (!env.POSTGREST_API_KEY) {
+    console.warn("[createPostrestContext] POSTGREST_API_KEY is not set — requests to PostgREST may fail");
+  }
   return { client: createClient(env.POSTGREST_URL, env.POSTGREST_API_KEY) };
 };
 

@@ -1,3 +1,8 @@
+-- Note: TransactionLog table is created by Prisma migrations, not in init scripts
+-- Creating view here would fail on first run, so we skip it
+-- It will be created automatically when Prisma migrations run
+
+/*
 CREATE OR REPLACE VIEW "UserProduct" AS (
   SELECT
     "userId",
@@ -65,8 +70,12 @@ SELECT
     "marketplaceApprovalStatus",
     (EXISTS (SELECT 1 FROM "Build" WHERE "Build"."projectId" = "Project".id AND "Build".deployment IS NOT NULL)) AS "isPublished"
 FROM "Project";
+*/
 
--- Grant permissions for DashboardProject
-GRANT SELECT ON "DashboardProject" TO anon;
-GRANT SELECT ON "DashboardProject" TO authenticated;
-GRANT SELECT ON "DashboardProject" TO service_role;
+-- Views will be created by Prisma migrations when tables are ready
+-- This keeps the database initialization simple for development
+
+-- Grant permissions will be set when views are created by Prisma
+-- GRANT SELECT ON "DashboardProject" TO anon;
+-- GRANT SELECT ON "DashboardProject" TO authenticated;
+-- GRANT SELECT ON "DashboardProject" TO service_role;

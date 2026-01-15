@@ -10,6 +10,7 @@ import {
   type CSS,
   Tooltip,
   Kbd,
+  Button,
 } from "@webstudio-is/design-system";
 import type { Project } from "@webstudio-is/project";
 import { $pages } from "~/shared/sync/data-stores";
@@ -27,6 +28,8 @@ import type { ReactNode } from "react";
 import { CloneButton } from "./clone";
 import { $selectedPage } from "~/shared/awareness";
 import { BuilderModeDropDown } from "./builder-mode";
+import { useState } from "react";
+import { SaveAsTemplateDialog } from "./SaveAsTemplateDialog";
 
 const PagesButton = () => {
   const page = useStore($selectedPage);
@@ -79,6 +82,46 @@ type TopbarProps = {
 
 export const Topbar = ({ project, hasProPlan, css, loading }: TopbarProps) => {
   const pages = useStore($pages);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const handleSaveTemplate = async ({ name, description, category }: { name: string; description: string; category: string }) => {
+    const payload = {
+      data: {
+        name,
+        description,
+        category,
+        webstudioProjectId: project.id,
+      },
+    };
+    console.log("[SaveAsTemplate] Sending payload to Strapi:", payload);
+    try {
+      const response = await fetch(`${process.env.STRAPI_URL}/api/website-templates`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.STRAPI_API_TOKEN ? { Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        const text = await response.text();
+        console.error("[SaveAsTemplate] Non-JSON response:", text);
+        alert("Non-JSON error response: " + text);
+        return;
+      }
+      console.log("[SaveAsTemplate] Strapi response:", result);
+      if (!response.ok) {
+        alert("Failed to save template: " + (result?.error?.message || response.statusText));
+      } else {
+        alert("Project saved as template!");
+      }
+    } catch (error) {
+      console.error("[SaveAsTemplate] Error saving template:", error);
+      alert("Error saving template: " + error);
+    }
+  };
   return (
     <nav className={topbarContainerStyle({ css })}>
       <Flex css={{ flexBasis: "20%" }}>
@@ -114,8 +157,15 @@ export const Topbar = ({ project, hasProPlan, css, loading }: TopbarProps) => {
           <ShareButton projectId={project.id} hasProPlan={hasProPlan} />
           <PublishButton projectId={project.id} />
           <CloneButton />
+          <Button onClick={() => setDialogOpen(true)} color="neutral">Save as Template</Button>
         </ToolbarToggleGroup>
       </Toolbar>
+      <SaveAsTemplateDialog
+        open={isDialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={handleSaveTemplate}
+        defaultName={project.title}
+      />
       {loading}
     </nav>
   );

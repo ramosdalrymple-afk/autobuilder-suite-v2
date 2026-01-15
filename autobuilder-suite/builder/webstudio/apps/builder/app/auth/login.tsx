@@ -1,10 +1,10 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { useEffect, useState } from "react";
 import {
   Button,
   Flex,
   globalCss,
   Text,
-  theme,
 } from "@webstudio-is/design-system";
 import { GithubIcon, GoogleIcon } from "@webstudio-is/icons";
 import { Form } from "@remix-run/react";
@@ -22,13 +22,28 @@ const globalStyles = globalCss({
   },
 });
 
+export type LoginProps = {
+  errorMessage: string;
+  isGithubEnabled: boolean;
+  isGoogleEnabled: boolean;
+  isSecretLoginEnabled: boolean;
+  serverMessage?: string;
+};
+
 export const Login = ({
   errorMessage,
   isGithubEnabled,
   isGoogleEnabled,
   isSecretLoginEnabled,
+  serverMessage,
 }: LoginProps) => {
   globalStyles();
+  
+  const [isErrorVisible, setIsErrorVisible] = useState(Boolean(errorMessage));
+
+  useEffect(() => {
+    setIsErrorVisible(Boolean(errorMessage));
+  }, [errorMessage]);
   
   return (
     <Flex
@@ -103,19 +118,49 @@ export const Login = ({
                 Continue with GitHub
               </Button>
             </Form>
-            
+
             {isSecretLoginEnabled && (
               <Flex justify="center" css={{ width: "100%", marginTop: "10px" }}>
                 <SecretLogin />
               </Flex>
             )}
           </Flex>
+
         </TooltipProvider>
 
-        {errorMessage && (
-          <Text align="center" css={{ color: "#FCA5A5", fontSize: "12px" }}>
-            {errorMessage}
-          </Text>
+        {/* DEV ONLY: Bypass button to go directly to dashboard */}
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            type="button"
+            color="ghost"
+            css={{ marginTop: "16px" }}
+            onClick={() => window.location.assign("/dashboard")}
+          >
+            Bypass (Dev Only)
+          </Button>
+        )}
+
+        {/* Inline error banner shown when there is a login error or server message */}
+        {(serverMessage || (errorMessage && isErrorVisible)) && (
+          <Flex
+            css={{
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              backgroundColor: serverMessage ? "rgba(250,204,21,0.06)" : "rgba(252,165,165,0.06)",
+              border: serverMessage ? "1px solid rgba(250,204,21,0.35)" : "1px solid rgba(252,165,165,0.35)",
+              padding: "10px 12px",
+              borderRadius: "8px",
+              marginTop: "12px",
+            }}
+          >
+            <Text css={{ color: serverMessage ? "#F59E0B" : "#FCA5A5", fontSize: "13px" }}>
+              {serverMessage ?? errorMessage}
+            </Text>
+            <Button color="ghost" onClick={() => setIsErrorVisible(false)}>
+              Close
+            </Button>
+          </Flex>
         )}
       </Flex>
 

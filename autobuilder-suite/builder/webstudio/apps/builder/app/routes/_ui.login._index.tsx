@@ -83,6 +83,18 @@ export const loader = async ({
 
   headers.append("Set-Cookie", await returnToCookie.serialize(returnTo));
 
+  // Check backend (PostgREST) reachability so we can show a helpful message on the login page
+  let serverMessage: string | undefined = undefined;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    await fetch(env.POSTGREST_URL, { method: "GET", signal: controller.signal });
+    clearTimeout(timeout);
+  } catch (error) {
+    console.error("[loader] PostgREST health check failed:", error);
+    serverMessage = "Backend service appears to be unreachable — some features (login/bypass) may not work.";
+  }
+
   return json(
     {
       isSecretLoginEnabled: env.DEV_LOGIN === "true",
@@ -90,6 +102,7 @@ export const loader = async ({
       isGoogleEnabled: Boolean(
         env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ),
+      serverMessage,
     },
     { headers }
   );
